@@ -1,4 +1,4 @@
-#include <cockpit.h>
+#include "cockpit.h"
 
 // Define some terms:
 // device signal - one bit in the buffer of one device, corresponds to one button or state of a multi state switch

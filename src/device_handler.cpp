@@ -11,13 +11,15 @@ DeviceHandler::DeviceHandler(
   uint8_t numOfSignalsPerDevice, 
   uint8_t* signalToButtonTable, 
   const uint8_t* joystickButtonUpdates,
-  Joystick_* joystick) :
+  Joystick_* joystick,
+  uint8_t* rotaryEncoderJoystickButtons) :
    m_deviceId(deviceId),
    m_i2cAddr(i2cAddr),
    m_numOfSignalsPerDevice(numOfSignalsPerDevice),
    m_signalToButtonTable(signalToButtonTable),
    m_joystickButtonUpdates(joystickButtonUpdates),
-   m_joystick(joystick)
+   m_joystick(joystick),
+   m_rotaryEncoderJoystickButtons(rotaryEncoderJoystickButtons)
 {
   m_signalState = 0;
   m_prevSignalState = 0;
@@ -71,8 +73,8 @@ bool DeviceHandler::getDeviceData(void)
     v = (buf[3] >> 4);
     m_rightRotaryEncoderState += (int8_t)(v | (0 - (v & 0x8)));
 
-    m_axisState[0] = ((uint32_t)buf[1] << 8UL) | ((uint32_t)buf[2]);
-    m_axisState[1] = ((uint32_t)buf[3] << 8UL) | ((uint32_t)buf[4]);
+    m_axisState[0] = ((uint32_t)(buf[1] & 0x3) << 8UL) | ((uint32_t)buf[2]);
+    m_axisState[1] = ((uint32_t)(buf[3] & 0x3) << 8UL) | ((uint32_t)buf[4]);
 
     return true;
 
@@ -131,32 +133,32 @@ void DeviceHandler::evaluateRotaryEncodeChange(void)
 
   if (m_leftRotaryEncoderState > 0)
   {
-    // Serial1.print("left counter: leftRotaryEncoderState[device]");
-    // Serial1.println(leftRotaryEncoderState[deviceList[deviceIndex]]);
-    m_joystick->setButton(firstRotaryButton, true);
+    // Serial1.print("leftRotaryEncoderState ");
+    // Serial1.println(m_leftRotaryEncoderState);
+    m_joystick->setButton(m_rotaryEncoderJoystickButtons[0], true);
     m_leftRotaryEncoderState--;
     l1 = true;
   }
 
   if (m_leftRotaryEncoderState < 0)
   {
-    // Serial1.print("left counter: leftRotaryEncoderState[device]");
-    // Serial1.println(leftRotaryEncoderState[deviceList[deviceIndex]]);
-    m_joystick->setButton(firstRotaryButton + 1, true);
+    // Serial1.print("leftRotaryEncoderState ");
+    // Serial1.println(m_leftRotaryEncoderState);
+    m_joystick->setButton(m_rotaryEncoderJoystickButtons[1], true);
     m_leftRotaryEncoderState++;
     l2 = true;
   }
 
   if (m_rightRotaryEncoderState > 0)
   {
-    m_joystick->setButton(firstRotaryButton + 2, true);
+    m_joystick->setButton(m_rotaryEncoderJoystickButtons[2], true);
     m_rightRotaryEncoderState--;
     r1 = true;
   }
 
   if (m_rightRotaryEncoderState < 0)
   {
-    m_joystick->setButton(firstRotaryButton + 3, true);
+    m_joystick->setButton(m_rotaryEncoderJoystickButtons[3], true);
     m_rightRotaryEncoderState++;
     r2 = true;
   }
@@ -165,10 +167,10 @@ void DeviceHandler::evaluateRotaryEncodeChange(void)
   {
     delay(15);
 
-    if (l1) m_joystick->setButton(firstRotaryButton, false);
-    if (l2) m_joystick->setButton(firstRotaryButton + 1, false);
-    if (r1) m_joystick->setButton(firstRotaryButton + 2, false);
-    if (r2) m_joystick->setButton(firstRotaryButton + 3, false);
+    if (l1) m_joystick->setButton(m_rotaryEncoderJoystickButtons[0], false);
+    if (l2) m_joystick->setButton(m_rotaryEncoderJoystickButtons[1], false);
+    if (r1) m_joystick->setButton(m_rotaryEncoderJoystickButtons[2], false);
+    if (r2) m_joystick->setButton(m_rotaryEncoderJoystickButtons[3], false);
   }
 }
 
@@ -207,6 +209,17 @@ void DeviceHandler::setAxis(uint8_t axisIndex, int16_t value)
     else if (axisIndex == 1)
     {
       m_joystick->setRzAxis(value);
+    }
+  }
+  else if (m_deviceId == 3)
+  {
+    if (axisIndex == 0)
+    {
+      m_joystick->setThrottle(value);
+    }
+    else if (axisIndex == 1)
+    {
+      m_joystick->setRudder(value);
     }
   }
 }

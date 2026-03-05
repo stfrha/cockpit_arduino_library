@@ -10,13 +10,15 @@ JoystickManager::JoystickManager(
   const int numOfSignalsPerDevice,
   const int numOfJoystickButtons,
   uint8_t* signalToButtonTable,
-  uint8_t* joystickButtonUpdates) :
+  uint8_t* joystickButtonUpdates,
+  uint8_t* rotaryEncoderJoystickButtons) :
    c_numOfDevices(numOfDevices),
    c_deviceList(deviceList),
    c_numOfSignalsPerDevice(numOfSignalsPerDevice),
    c_numOfJoystickButtons(numOfJoystickButtons),
    m_signalToButtonTable(signalToButtonTable),
-   m_joystickButtonUpdates(joystickButtonUpdates)
+   m_joystickButtonUpdates(joystickButtonUpdates),
+   m_rotaryEncoderJoystickButtons(rotaryEncoderJoystickButtons)
 {
   m_joystick = new Joystick_(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_JOYSTICK, 
      122, 0,
@@ -26,6 +28,7 @@ JoystickManager::JoystickManager(
      true, true,   // Device  3 use rudder-axis and trottle-axis
      false, false, false);
    
+    
    
   for (int deviceIndex = 0; deviceIndex < c_numOfDevices; deviceIndex++)
   {
@@ -35,7 +38,8 @@ JoystickManager::JoystickManager(
       c_numOfSignalsPerDevice,
       &m_signalToButtonTable[deviceIndex * c_numOfSignalsPerDevice],
       m_joystickButtonUpdates,
-      m_joystick);
+      m_joystick,
+      m_rotaryEncoderJoystickButtons);
   }
 
 
@@ -44,6 +48,18 @@ JoystickManager::JoystickManager(
 
 void JoystickManager::initiateAllDevices(void)
 {
+   
+  m_joystick->setXAxisRange(0, 1023);
+  m_joystick->setYAxisRange(0, 1023);
+  m_joystick->setZAxisRange(0, 1023);
+  m_joystick->setRxAxisRange(0, 1023);
+  m_joystick->setRyAxisRange(0, 1023);
+  m_joystick->setRzAxisRange(0, 1023);
+  m_joystick->setRudderRange(0, 1023);
+  m_joystick->setThrottleRange(0, 1023);
+  
+  m_joystick->begin();
+ 
   I2cCommunication::initializeI2c();
 
   Serial1.println("Initiating devices...");
@@ -68,15 +84,17 @@ void JoystickManager::sendJoystickButtons(void)
   {
     if (m_joystickButtonUpdates[i] == 3)
     {
-      Serial1.print("Joystick button: ");
-      Serial1.print(i);
-      Serial1.println(" is pressed.");
+      // Serial1.print("Joystick button: ");
+      // Serial1.print(i);
+      // Serial1.println(" is pressed.");
+      m_joystick->setButton(i, true);
     }
     else if (m_joystickButtonUpdates[i] == 2)
     {
-      Serial1.print("Joystick button: ");
-      Serial1.print(i);
-      Serial1.println(" is released.");
+      // Serial1.print("Joystick button: ");
+      // Serial1.print(i);
+      // Serial1.println(" is released.");
+      m_joystick->setButton(i, false);
     }
 
     // Reset state

@@ -20,6 +20,7 @@ private:
   uint8_t* m_signalToButtonTable;
   uint8_t* m_joystickButtonUpdates;
   Joystick_* m_joystick;
+  uint8_t* m_rotaryEncoderJoystickButtons;
   
 public:
   DeviceHandler(
@@ -28,7 +29,8 @@ public:
     uint8_t numOfSignalsPerDevice, 
     uint8_t* signalToButtonTable, 
     const uint8_t* joystickButtonUpdates,
-    Joystick_* joystick);
+    Joystick_* joystick,
+    uint8_t* rotaryEncoderJoystickButtons);
 
   bool reportDeviceExists(void);
   void initiatePreviousData(void);
