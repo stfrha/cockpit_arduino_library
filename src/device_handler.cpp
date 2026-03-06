@@ -6,6 +6,7 @@
 
 
 DeviceHandler::DeviceHandler(
+  uint8_t deviceIndex,
   uint8_t deviceId, 
   uint8_t i2cAddr, 
   uint8_t numOfSignalsPerDevice, 
@@ -13,6 +14,7 @@ DeviceHandler::DeviceHandler(
   const uint8_t* joystickButtonUpdates,
   Joystick_* joystick,
   uint8_t* rotaryEncoderJoystickButtons) :
+   m_deviceIndex(deviceIndex),
    m_deviceId(deviceId),
    m_i2cAddr(i2cAddr),
    m_numOfSignalsPerDevice(numOfSignalsPerDevice),
@@ -178,7 +180,7 @@ void DeviceHandler::evaluateRotaryEncodeChange(void)
 
 void DeviceHandler::setAxis(uint8_t axisIndex, int16_t value)
 {
-  if (m_deviceId == 0)
+  if (m_deviceIndex == 0)
   {
     if (axisIndex == 0)
     {
@@ -189,7 +191,7 @@ void DeviceHandler::setAxis(uint8_t axisIndex, int16_t value)
       m_joystick->setYAxis(value);
     }
   }
-  else if (m_deviceId == 1)
+  else if (m_deviceIndex == 1)
   {
     if (axisIndex == 0)
     {
@@ -200,7 +202,7 @@ void DeviceHandler::setAxis(uint8_t axisIndex, int16_t value)
       m_joystick->setRxAxis(value);
     }
   }
-  else if (m_deviceId == 2)
+  else if (m_deviceIndex == 2)
   {
     if (axisIndex == 0)
     {
@@ -209,17 +211,6 @@ void DeviceHandler::setAxis(uint8_t axisIndex, int16_t value)
     else if (axisIndex == 1)
     {
       m_joystick->setRzAxis(value);
-    }
-  }
-  else if (m_deviceId == 3)
-  {
-    if (axisIndex == 0)
-    {
-      m_joystick->setThrottle(value);
-    }
-    else if (axisIndex == 1)
-    {
-      m_joystick->setRudder(value);
     }
   }
 }

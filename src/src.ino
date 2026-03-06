@@ -1,3 +1,4 @@
+
 #include "cockpit.h"
 
 // Define some terms:
@@ -8,7 +9,7 @@ const int numOfDevices = 3;
 const int8_t deviceList[4] = {0, 1, 3, -1};
 
 const int numOfSignalsPerDevice = 30;  // the number of signals in one device, according to the bitvector from the device
-const int numOfJoystickButtons = 57;   // The total number of joystick buttons that can be set
+const int numOfJoystickButtons = 59;   // The total number of joystick buttons that can be set
 
 uint8_t joystickButtonUpdates[numOfJoystickButtons];
 
@@ -62,11 +63,11 @@ uint8_t signalToButtonTable[numOfDevices][numOfSignalsPerDevice] = {
     -1,
     30,
     31,
+    -1,
     32,
     33,
     34,
     35,
-    -1,
     -1,
     -1,
     -1,
@@ -81,8 +82,8 @@ uint8_t signalToButtonTable[numOfDevices][numOfSignalsPerDevice] = {
   {
     36,
     37,
-    -1,
-    -1,
+    57,
+    58,
     -1,
     38,
     39,
@@ -112,7 +113,7 @@ uint8_t signalToButtonTable[numOfDevices][numOfSignalsPerDevice] = {
   }
 };
 
-uint8_t rotaryEncoderJoystickButtons[4] = { 57, 58, 59, 60}; // Left CW, Left CCW, Right CW, Right CCW
+uint8_t rotaryEncoderJoystickButtons[4] = { 90, 91, 92, 93}; // Left CW, Left CCW, Right CW, Right CCW
 
 JoystickManager jMgr(
   numOfDevices,
@@ -172,8 +173,6 @@ void handleSpecialJoystickButtonChanges(void)
     {
       joystickButtonUpdates[44] = 2;
     }
-
-
 }
 
 

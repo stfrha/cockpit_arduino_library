@@ -8,6 +8,7 @@
 class DeviceHandler
 {
 private:
+  uint8_t m_deviceIndex;
   uint8_t m_deviceId;
   uint8_t m_numOfSignalsPerDevice;
   uint8_t m_i2cAddr;
@@ -24,6 +25,7 @@ private:
   
 public:
   DeviceHandler(
+    uint8_t deviceIndex,
     uint8_t deviceId, 
     uint8_t i2cAddr, 
     uint8_t numOfSignalsPerDevice, 

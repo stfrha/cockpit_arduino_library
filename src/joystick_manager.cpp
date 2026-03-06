@@ -22,10 +22,10 @@ JoystickManager::JoystickManager(
 {
   m_joystick = new Joystick_(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_JOYSTICK, 
      122, 0,
-     true, true,   // Device  0 use x-axis and y-axis
-     true, true,   // Device  1 use z-axis and Rx-axis
-     true, true,   // Device  2 use Ry-axis and Rz-axis
-     true, true,   // Device  3 use rudder-axis and trottle-axis
+     true, true,   // DeviceIndex  0 use x-axis and y-axis
+     true, true,   // DeviceIndex  1 use z-axis and Rx-axis
+     true, true,   // DeviceIndex  2 use Ry-axis and Rz-axis
+     false, false, // DeviceIndex  3 Cannot use axises as of now
      false, false, false);
    
     
@@ -33,6 +33,7 @@ JoystickManager::JoystickManager(
   for (int deviceIndex = 0; deviceIndex < c_numOfDevices; deviceIndex++)
   {
     m_devices[deviceIndex] = new DeviceHandler(
+      deviceIndex,
       c_deviceList[deviceIndex], 
       c_i2cAddr[c_deviceList[deviceIndex]],
       c_numOfSignalsPerDevice,
@@ -55,8 +56,6 @@ void JoystickManager::initiateAllDevices(void)
   m_joystick->setRxAxisRange(0, 1023);
   m_joystick->setRyAxisRange(0, 1023);
   m_joystick->setRzAxisRange(0, 1023);
-  m_joystick->setRudderRange(0, 1023);
-  m_joystick->setThrottleRange(0, 1023);
   
   m_joystick->begin();
  
