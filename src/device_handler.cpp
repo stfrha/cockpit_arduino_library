@@ -180,7 +180,7 @@ void DeviceHandler::evaluateRotaryEncodeChange(void)
     if (l2) m_joystick->setButton(m_rotaryEncoderJoystickButtons[1], false);
     if (r1) m_joystick->setButton(m_rotaryEncoderJoystickButtons[2], false);
     if (r2) m_joystick->setButton(m_rotaryEncoderJoystickButtons[3], false);
-    Serial1.println("Sending some rotary thingis...");
+    // Serial1.println("Sending some rotary thingis...");
 
   }
 }
@@ -228,15 +228,14 @@ void DeviceHandler::setAxis(uint8_t axisIndex, int16_t value)
     if (axisIndex == 0)
     {
       m_joystick->setSlider(value);
-      delay(2);
-      Serial1.print("Setting slider to ");
-      Serial1.println(value);
+      // Serial1.print("Setting slider to ");
+      // Serial1.println(value);
     }
     else if (axisIndex == 1)
     {
       m_joystick->setDial(value);
-      Serial1.print("Setting dial to ");
-      Serial1.println(value);
+      // Serial1.print("Setting dial to ");
+      // Serial1.println(value);
     }
   }
 }
