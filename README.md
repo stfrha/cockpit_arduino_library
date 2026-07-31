@@ -2,6 +2,8 @@
 
 This is the arduino library for the cockpit projekt. It is used by all Arduino joystick boards with minimal changes for each individual board. 
 
+The library requires the stfrha/ArduinoJoystickLibrary8axis repository to be added as a library to the scetch. 
+
 To build a project, clone the following repository:
 git@github.com:stfrha/cockpit_arduino.git
 
