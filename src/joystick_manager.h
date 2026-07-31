@@ -22,6 +22,10 @@ private:
    
   DeviceHandler* m_devices[4];
 
+  void serialHex(uint8_t v);
+
+
+
 public:
   JoystickManager(
     const int numOfDevices, 
@@ -35,6 +39,9 @@ public:
   void initiateAllDevices(void);
   void processDevices(void);
   void sendJoystickButtons(void);
+
+  void initiateTestMode(void);
+  void executeTestMode(uint8_t* buf);
 };
 
 #endif

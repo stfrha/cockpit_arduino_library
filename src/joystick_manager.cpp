@@ -120,3 +120,34 @@ void JoystickManager::sendJoystickButtons(void)
 
 }
 
+  void JoystickManager::initiateTestMode(void)
+  {
+    Serial1.println("This data printout is best viewed in a terminal where carrige return works as expected.");
+    Serial1.println("");
+    Serial1.println("               Device 0                               |               Device 1                                |               Device 2                                |               Device 3                                |");
+    Serial1.println("ADC0H- ADC0L- ADC1H- ADC1L-   5  -   6  -   7  -   8  -ADC0H -ADC0L -ADC1H -ADC1L -   5  -   6  -   7  -   8  -ADC0H -ADC0L -ADC1H -ADC1L -   5  -   6  -   7  -   8  -ADC0H -ADC0L -ADC1H -ADC1L -   5  -   6  -   7  -   8  -");
+    Serial1.println("R0 | AD0    |R1 |AD1      |EX |RO  |RC  |BR  |LC  |TR |R0 | AD0     |R1 |AD1      |EX |RO  |RC  |BR  |LC  |TR |R0 | AD0     |R1 |AD1      |EX |RO  |RC  |BR  |LC  |TR |R0 | AD0     |R1 |AD1      |EX |RO  |RC  |BR  |LC  |TR |");
+  }
+  
+  
+  void JoystickManager::executeTestMode(uint8_t* buf)
+  {
+        for (int i = 1; i < 9; i++)
+        {
+          serialHex(buf[i]);
+          Serial1.print(" - ");
+        }
+  }
+
+
+void JoystickManager::serialHex(uint8_t v)
+{
+  Serial1.print("0x");
+
+  if (v < 0x10)
+  {
+    Serial1.print('0');
+  }
+  Serial1.print(v, HEX);
+}
+
