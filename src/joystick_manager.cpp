@@ -11,7 +11,7 @@ JoystickManager::JoystickManager(
   const int numOfJoystickButtons,
   uint8_t* signalToButtonTable,
   uint8_t* joystickButtonUpdates,
-  uint8_t* rotaryEncoderJoystickButtons) :
+  int8_t* rotaryEncoderJoystickButtons) :
    c_numOfDevices(numOfDevices),
    c_deviceList(deviceList),
    c_numOfSignalsPerDevice(numOfSignalsPerDevice),
@@ -20,13 +20,21 @@ JoystickManager::JoystickManager(
    m_joystickButtonUpdates(joystickButtonUpdates),
    m_rotaryEncoderJoystickButtons(rotaryEncoderJoystickButtons)
 {
-  m_joystick = new Joystick_(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_JOYSTICK, 
+  m_joystick = new Joystick_(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_GAMEPAD, 
      122, 0,
-     true, true,   // DeviceIndex  0 use x-axis and y-axis
-     true, true,   // DeviceIndex  1 use z-axis and Rx-axis
-     true, true,   // DeviceIndex  2 use Ry-axis and Rz-axis
-     false, false, // DeviceIndex  3 Cannot use axises as of now
-     false, false, false);
+     true,    // x-axis
+     true,    // y-axis
+     true,    // z-axis
+     true,    // rx-axis
+     true,    // ry-axis
+     true,    // rz-axis
+     false,   // rudder-axis
+     false,   // throttle-axis
+     false,   // accelerator-axis
+     false,   // brake-axis
+     false,   // steering-axis
+     true,    // slider-axis
+     true);   // dial-axis
    
     
    
@@ -40,7 +48,7 @@ JoystickManager::JoystickManager(
       &m_signalToButtonTable[deviceIndex * c_numOfSignalsPerDevice],
       m_joystickButtonUpdates,
       m_joystick,
-      m_rotaryEncoderJoystickButtons);
+      &m_rotaryEncoderJoystickButtons[deviceIndex * 4]);
   }
 
 
@@ -50,12 +58,19 @@ JoystickManager::JoystickManager(
 void JoystickManager::initiateAllDevices(void)
 {
    
-  m_joystick->setXAxisRange(0, 1023);
+  m_joystick->setXAxisRange(0, 255);
   m_joystick->setYAxisRange(0, 1023);
   m_joystick->setZAxisRange(0, 1023);
   m_joystick->setRxAxisRange(0, 1023);
   m_joystick->setRyAxisRange(0, 1023);
   m_joystick->setRzAxisRange(0, 1023);
+  // m_joystick->setRudderRange(0, 1023);
+  // m_joystick->setAcceleratorRange(0, 1023);
+  // m_joystick->setThrottleRange(0, 1023);
+  // m_joystick->setBrakeRange(0, 1023);
+  // m_joystick->setSteeringRange(0, 255);
+  m_joystick->setSliderRange(0, 1023);
+  m_joystick->setDialRange(0, 1023);
   
   m_joystick->begin();
  

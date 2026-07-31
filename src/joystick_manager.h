@@ -16,7 +16,7 @@ private:
   const int c_numOfJoystickButtons;
   uint8_t* m_signalToButtonTable;
   uint8_t* m_joystickButtonUpdates;  // 0 = no change, 2 = change to release ed, 3 = change to pressed
-  uint8_t* m_rotaryEncoderJoystickButtons;
+  int8_t* m_rotaryEncoderJoystickButtons;
 
   Joystick_* m_joystick;
    
@@ -30,7 +30,7 @@ public:
     const int numOfJoystickButtons,
     uint8_t* signalToButtonTable,
     uint8_t* joystickButtonUpdates,
-    uint8_t* rotaryEncoderJoystickButtons);
+    int8_t* rotaryEncoderJoystickButtons);
 
   void initiateAllDevices(void);
   void processDevices(void);

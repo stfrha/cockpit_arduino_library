@@ -13,7 +13,7 @@ DeviceHandler::DeviceHandler(
   uint8_t* signalToButtonTable, 
   const uint8_t* joystickButtonUpdates,
   Joystick_* joystick,
-  uint8_t* rotaryEncoderJoystickButtons) :
+  int8_t* rotaryEncoderJoystickButtons) :
    m_deviceIndex(deviceIndex),
    m_deviceId(deviceId),
    m_i2cAddr(i2cAddr),
@@ -123,46 +123,53 @@ void DeviceHandler::decodeJoystickButtonChange(void)
 
 void DeviceHandler::evaluateRotaryEncodeChange(void)
 {
-  // NOTE: For now, this only works for one device having rotary switch. If multiple devices
-  // has this, the total steps will add for all devices
-
-  uint8_t firstRotaryButton = m_numOfSignalsPerDevice * 4;
-
   bool r1 = false;
   bool l1 = false;
   bool r2 = false;
   bool l2 = false;
 
-  if (m_leftRotaryEncoderState > 0)
+  if (m_rotaryEncoderJoystickButtons[0] >= 0)
   {
-    // Serial1.print("leftRotaryEncoderState ");
-    // Serial1.println(m_leftRotaryEncoderState);
-    m_joystick->setButton(m_rotaryEncoderJoystickButtons[0], true);
-    m_leftRotaryEncoderState--;
-    l1 = true;
+    if (m_leftRotaryEncoderState > 0)
+    {
+      // Serial1.print("leftRotaryEncoderState ");
+      // Serial1.println(m_leftRotaryEncoderState);
+      m_joystick->setButton(m_rotaryEncoderJoystickButtons[0], true);
+      m_leftRotaryEncoderState--;
+      l1 = true;
+    }
   }
 
-  if (m_leftRotaryEncoderState < 0)
+  if (m_rotaryEncoderJoystickButtons[1] >= 0)
   {
-    // Serial1.print("leftRotaryEncoderState ");
-    // Serial1.println(m_leftRotaryEncoderState);
-    m_joystick->setButton(m_rotaryEncoderJoystickButtons[1], true);
-    m_leftRotaryEncoderState++;
-    l2 = true;
+    if (m_leftRotaryEncoderState < 0)
+    {
+      // Serial1.print("leftRotaryEncoderState ");
+      // Serial1.println(m_leftRotaryEncoderState);
+      m_joystick->setButton(m_rotaryEncoderJoystickButtons[1], true);
+      m_leftRotaryEncoderState++;
+      l2 = true;
+    }
   }
 
-  if (m_rightRotaryEncoderState > 0)
+  if (m_rotaryEncoderJoystickButtons[2] >= 0)
   {
-    m_joystick->setButton(m_rotaryEncoderJoystickButtons[2], true);
-    m_rightRotaryEncoderState--;
-    r1 = true;
+    if (m_rightRotaryEncoderState > 0)
+    {
+      m_joystick->setButton(m_rotaryEncoderJoystickButtons[2], true);
+      m_rightRotaryEncoderState--;
+      r1 = true;
+    }
   }
 
-  if (m_rightRotaryEncoderState < 0)
+  if (m_rotaryEncoderJoystickButtons[3] >= 0)
   {
-    m_joystick->setButton(m_rotaryEncoderJoystickButtons[3], true);
-    m_rightRotaryEncoderState++;
-    r2 = true;
+    if (m_rightRotaryEncoderState < 0)
+    {
+      m_joystick->setButton(m_rotaryEncoderJoystickButtons[3], true);
+      m_rightRotaryEncoderState++;
+      r2 = true;
+    }
   }
 
   if (r1 || l1 || r2 || l2)
@@ -173,6 +180,8 @@ void DeviceHandler::evaluateRotaryEncodeChange(void)
     if (l2) m_joystick->setButton(m_rotaryEncoderJoystickButtons[1], false);
     if (r1) m_joystick->setButton(m_rotaryEncoderJoystickButtons[2], false);
     if (r2) m_joystick->setButton(m_rotaryEncoderJoystickButtons[3], false);
+    Serial1.println("Sending some rotary thingis...");
+
   }
 }
 
@@ -185,6 +194,7 @@ void DeviceHandler::setAxis(uint8_t axisIndex, int16_t value)
     if (axisIndex == 0)
     {
       m_joystick->setXAxis(value);
+      delay(2);
     }
     else if (axisIndex == 1)
     {
@@ -213,6 +223,22 @@ void DeviceHandler::setAxis(uint8_t axisIndex, int16_t value)
       m_joystick->setRzAxis(value);
     }
   }
+  else if (m_deviceIndex == 3)
+  {
+    if (axisIndex == 0)
+    {
+      m_joystick->setSlider(value);
+      delay(2);
+      Serial1.print("Setting slider to ");
+      Serial1.println(value);
+    }
+    else if (axisIndex == 1)
+    {
+      m_joystick->setDial(value);
+      Serial1.print("Setting dial to ");
+      Serial1.println(value);
+    }
+  }
 }
 
 void DeviceHandler::evaluateJoystickAxisChange(void)
@@ -221,7 +247,6 @@ void DeviceHandler::evaluateJoystickAxisChange(void)
   {
     if ((abs(m_axisState[i] - m_prevAxisState[i])) > 5)
     {
-      // TODO: Handle axis changed joystick command
       setAxis(i, m_axisState[i]);
 
       m_prevAxisState[i] = m_axisState[i];

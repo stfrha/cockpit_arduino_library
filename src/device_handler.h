@@ -13,7 +13,7 @@ private:
   uint8_t m_numOfSignalsPerDevice;
   uint8_t m_i2cAddr;
   uint32_t m_signalState = 0;
-  int8_t m_leftRotaryEncoderState;
+  int8_t m_leftRotaryEncoderState;    // The naming (left and right) is not necessarilly correct but perhaps good enough to seperate them in the mind
   int8_t m_rightRotaryEncoderState;
   uint32_t m_prevSignalState = 0;
   int16_t m_axisState[2] = { 0, 0};
@@ -21,7 +21,7 @@ private:
   uint8_t* m_signalToButtonTable;
   uint8_t* m_joystickButtonUpdates;
   Joystick_* m_joystick;
-  uint8_t* m_rotaryEncoderJoystickButtons;
+  int8_t* m_rotaryEncoderJoystickButtons;
   
 public:
   DeviceHandler(
@@ -32,7 +32,7 @@ public:
     uint8_t* signalToButtonTable, 
     const uint8_t* joystickButtonUpdates,
     Joystick_* joystick,
-    uint8_t* rotaryEncoderJoystickButtons);
+    int8_t* rotaryEncoderJoystickButtons);
 
   bool reportDeviceExists(void);
   void initiatePreviousData(void);
