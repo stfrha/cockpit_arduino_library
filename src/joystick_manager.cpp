@@ -181,6 +181,7 @@ bool JoystickManager::executeButtonSequence(
     return false;
   }
 
+  m_sequenceRunning = true;
   m_pressCounter = 0;
   m_numOfPresses = numOfPresses;
   m_buttonId = buttonId;
