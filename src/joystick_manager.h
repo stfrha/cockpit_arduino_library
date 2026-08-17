@@ -23,7 +23,7 @@ private:
   bool m_buttonDepressed;
   uint8_t m_timeCounter;
   uint8_t m_pressCounter;
-  uint8_t m_numOfPresses
+  uint8_t m_numOfPresses;
   uint8_t m_buttonId;
   uint8_t m_timeOn;
   uint8_t m_timeOff;
