@@ -1,14 +1,17 @@
+
 #include <cockpit.h>
 
 // Define some terms:
 // device signal - one bit in the buffer of one device, corresponds to one button or state of a multi state switch
 // joystick button - one button on the usb interface, can be sourced from single or multiple device signals
 
-const int numOfDevices = 3;
-const int8_t deviceList[4] = {0, 1, 3, -1};
+const int numOfDevices = 4;
+const int8_t deviceList[4] = {0, 1, 2, 3};
 
 const int numOfSignalsPerDevice = 30;  // the number of signals in one device, according to the bitvector from the device
-const int numOfJoystickButtons = 57;   // The total number of joystick buttons that can be set
+const int numOfJoystickButtons = 55;   // The total number of joystick buttons that can be set
+
+const bool testMode = false;
 
 uint8_t joystickButtonUpdates[numOfJoystickButtons];
 
@@ -18,18 +21,18 @@ uint8_t signalToButtonTable[numOfDevices][numOfSignalsPerDevice] = {
     0,
     1,
     2,
-    3,
     4,
     5,
     6,
+    -1,
+    -1,
+    13,
+    14,
+    10,
+    3,
     7,
     8,
     9,
-    10,
-    11,
-    12,
-    13,
-    14,
     15,
     16,
     17,
@@ -39,71 +42,103 @@ uint8_t signalToButtonTable[numOfDevices][numOfSignalsPerDevice] = {
     21,
     22,
     23,
+    -1,
+    -1,
+    -1,
+    -1,
+    11,
+    12
+  },
+  {
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1
+  },
+  {
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
     24,
     25,
     26,
-    27,
-    -1,
-    -1
-  },
-  {
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
     28,
     29,
-    -1,
     30,
     31,
     32,
-    33,
-    34,
-    35,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1
+    33
   },
   {
+    34,
+    35,
     36,
     37,
-    -1,
-    -1,
-    -1,
     38,
     39,
     40,
-    -1,
-    -1,
+    41,
     42,
     43,
+    44,
     45,
     46,
-    -1,
     47,
     48,
     49,
     50,
     51,
+    -1,
+    -1,
     52,
     53,
     54,
-    55,
-    56,
+    -1,
+    -1,
     -1,
     -1,
     -1,
@@ -112,7 +147,19 @@ uint8_t signalToButtonTable[numOfDevices][numOfSignalsPerDevice] = {
   }
 };
 
-uint8_t rotaryEncoderJoystickButtons[4] = { 57, 58, 59, 60}; // Left CW, Left CCW, Right CW, Right CCW
+int8_t rotaryEncoderJoystickButtons[numOfDevices][4] = {
+  { -1, -1, -1, -1},
+  { -1, -1, -1, -1},
+  { 90, 91, -1, -1}, // Radar Altimeter CW, Radar Altimeter  CCW
+  { -1, -1, -1, -1}
+}; 
+
+// int8_t rotaryEncoderJoystickButtons[numOfDevices][4] = {
+//   { -1, -1, -1, -1},
+//   { -1, -1, -1, -1},
+//   { -1, -1, -1, -1}, // Radar Altimeter CW, Radar Altimeter  CCW
+//   { -1, -1, -1, -1}
+// }; 
 
 JoystickManager jMgr(
   numOfDevices,
@@ -121,59 +168,27 @@ JoystickManager jMgr(
   numOfJoystickButtons, 
   &signalToButtonTable[0][0], 
   joystickButtonUpdates,
-  rotaryEncoderJoystickButtons);
-
-
-uint8_t button41State = 0; // 0 = 41 off, 1 = 41 pending, 2 = 41 On
-uint8_t button41PendingCounter = 0;
+  &rotaryEncoderJoystickButtons[0][0]);
 
 void handleSpecialJoystickButtonChanges(void)
 {
   // This is special handling for combinations of signals to joystick buttons
+  // not used for this joystick.
 
-  // RWR Rotary switch state machine
-  if (button41State == 0)
+  // This is special handling for button sequences
+  if (joystickButtonUpdates[15] == 3)  // Ejection button
   {
-    if ((joystickButtonUpdates[38] == 0) && (joystickButtonUpdates[39] == 0) && (joystickButtonUpdates[40] == 2))
-    {
-      button41State = 1;
-      button41PendingCounter = 0;
-    }
-  }
-  else if (button41State == 1)
-  {
-    if ((joystickButtonUpdates[38] == 0) && (joystickButtonUpdates[39] == 3) && (joystickButtonUpdates[40] == 0))
-    {
-      button41State = 0;
-    }
-    button41PendingCounter++;
-
-    if (button41PendingCounter >= 7)
-    {
-      button41State = 3;
-      joystickButtonUpdates[41] = 3;
-    }
-  }
-  else if (button41State == 3)
-  {
-    if ((joystickButtonUpdates[38] == 0) && (joystickButtonUpdates[39] == 0) && (joystickButtonUpdates[40] == 3))
-    {
-      button41State = 0;
-      joystickButtonUpdates[41] = 2;
-    }
+    // Start sequence for three button presses with 150 ms on and 150 ms off
+    jMgr.executeButtonSequence(15, 3, 9, 9);
   }
 
-  // CMDS three way switch
-    if ((joystickButtonUpdates[42] == 2) || (joystickButtonUpdates[43] == 2))
-    {
-      joystickButtonUpdates[44] = 3;
-    }
-    else if ((joystickButtonUpdates[42] == 3) || (joystickButtonUpdates[43] == 3))
-    {
-      joystickButtonUpdates[44] = 2;
-    }
-
-
+  // Since all control of this button need to be under the sequencer's control, we
+  // must suppress all key presses and releases.
+  if (joystickButtonUpdates[15] != 0)
+  {
+    // Reset original press as it will be handled by the sequencer
+    joystickButtonUpdates[15] = 0;
+  }
 }
 
 
@@ -203,9 +218,13 @@ void setup()
   jMgr.initiateAllDevices();
 
   time.resetBenchmarking();
+
+  if (testMode)
+  {
+    jMgr.initiateTestMode();
+  }
 }
 
-bool testMode = false;
 uint8_t testBuf[10];
 const uint8_t c_i2cAddr[4] = {0xC, 0xD, 0xE, 0xF};
 
@@ -218,15 +237,12 @@ void loop()
     {
       if (I2cCommunication::requestCycle(c_i2cAddr[i], 11, testBuf, 0))
       {
-        for (int i = 0; i < 11; i++)
-        {
-          Serial1.print(testBuf[i], HEX);
-          Serial1.print(" - 0x");
-        }
+        jMgr.executeTestMode(testBuf);
       }
     }
-    Serial1.println("");
-    delay(16);
+    // Serial1.println("");
+    Serial1.print('\r');
+    delay(2);
 
 //    delay(250);
 
