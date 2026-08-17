@@ -51,9 +51,52 @@ JoystickManager::JoystickManager(
       &m_rotaryEncoderJoystickButtons[deviceIndex * 4]);
   }
 
+  // Initiate button sequencer	
+  m_sequenceRunning = false;
+  m_buttonDepressed = false;
+  m_pressCounter = 0;
+  m_numOfPresses = 0;
 
 }
 
+void JoystickManager::handleButtonSequence(void)
+{
+  if (m_sequenceRunning)
+  {
+    m_timeCounter++;
+
+    if (m_buttonDepressed)
+    {
+      if (m_timeCounter > m_timeOn)
+      {
+        // Send button off
+        m_joystick->setButton(m_buttonId, false);
+        m_buttonDepressed = false;
+        m_timeCounter = 0;
+      }
+    } 
+    else
+    {
+      if (m_timeCounter > m_timeOff)
+      {
+        m_pressCounter++;
+
+        // Check if the sequence is finished
+        if (m_pressCounter >= m_numOfPresses)
+        {
+          m_sequenceRunning = false;
+          return;
+        }
+
+        // If we get here, we are not yet finished
+        // Send button on
+        m_joystick->setButton(m_buttonId, true);
+        m_buttonDepressed = true
+        m_timeCounter = 0;
+      }
+    }
+  }
+}
 
 void JoystickManager::initiateAllDevices(void)
 {
@@ -89,6 +132,10 @@ void JoystickManager::processDevices(void)
   {
     m_devices[device]->processDevice();
   }
+  
+  // Run button sequence (if non is started, nothing will be done)
+  handleButtonSequence();
+
 }
 
 void JoystickManager::sendJoystickButtons(void)
@@ -120,7 +167,34 @@ void JoystickManager::sendJoystickButtons(void)
 
 }
 
-  void JoystickManager::initiateTestMode(void)
+
+// Starts a button press sequence. If a sequence is already running, this method will
+// return false and the new sequence will be ignored (the current sequence will continue).
+bool JoystickManager::executeButtonSequence(
+  uint8_t buttonId, 
+  uint8_t numOfPresses, 
+  uint8_t timeOn, 
+  uint8_t timeOff)
+{
+  if (m_sequenceRunning)
+  {
+    return false;
+  }
+
+  m_pressCounter = 0;
+  m_numOfPresses = numOfPresses;
+  m_buttonId = buttonId;
+  m_timeOn = timeOn;
+  m_timeOff = timeOff;
+  
+  // We depress the first iteration immediately
+  m_joystick->setButton(m_buttonId, true);
+  m_buttonDepressed = true;
+  return true;
+}
+
+
+void JoystickManager::initiateTestMode(void)
   {
     Serial1.println("This data printout is best viewed in a terminal where carrige return works as expected.");
     Serial1.println("");
