@@ -91,7 +91,7 @@ void JoystickManager::handleButtonSequence(void)
         // If we get here, we are not yet finished
         // Send button on
         m_joystick->setButton(m_buttonId, true);
-        m_buttonDepressed = true
+        m_buttonDepressed = true;
         m_timeCounter = 0;
       }
     }
